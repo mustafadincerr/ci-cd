@@ -2,14 +2,14 @@ pipeline {
     agent any
 
     environment {
-        DOCKERHUB_CREDENTIALS = credentials('dockerhub-credentials') // Docker Hub kullanıcı adı ve şifre tanımlı olmalı
-        IMAGE_NAME = 'your_dockerhub_username/backend-app' // Docker Hub için imaj adı
+        DOCKERHUB_CREDENTIALS = credentials('mustafadincer') // Docker Hub kullanıcı adı ve şifre tanımlı olmalı
+        IMAGE_NAME = 'mustafadincer/backend-app' // Docker Hub için imaj adı
     }
 
     stages {
         stage('Checkout') {
             steps {
-                git url: 'https://github.com/yourusername/yourrepo.git', branch: 'master'
+                git url: 'https://github.com/mustafadincerr/ci-cd.git', branch: 'master'
             }
         }
 
