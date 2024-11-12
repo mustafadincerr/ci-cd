@@ -2,33 +2,51 @@ pipeline {
     agent any
 
     environment {
-        DOCKERHUB_CREDENTIALS = credentials('mustafadincer') // Docker Hub kimlik bilgisi ID'si
-        IMAGE_NAME = 'mustafadincer/ci-cdd' // Docker Hub imaj adı
+        DOCKER_HUB_REPO = 'mustafadincer/ci-cdd'  // Docker Hub kullanıcı adı ve repo adı
     }
 
     stages {
         stage('Checkout') {
             steps {
-                git url: 'https://github.com/mustafadincerr/ci-cd.git', branch: 'master'
+                // GitHub deposundan kodu çekiyoruz
+                checkout scm
             }
         }
-
+        
         stage('Build Docker Image') {
             steps {
-                // Docker imajı oluşturma
-                sh "docker build -t ${IMAGE_NAME}:${env.BUILD_ID} ."
+                script {
+                    // Docker imajını oluşturuyoruz
+                    docker.build("${DOCKER_HUB_REPO}:latest")
+                }
             }
         }
-
-        stage('Push Docker Image') {
+        
+        stage('Login to Docker Hub') {
             steps {
                 script {
-                    // Docker Hub'a push etme
-                    docker.withRegistry('', 'DOCKERHUB_CREDENTIALS') {
-                        sh "docker push ${IMAGE_NAME}:${env.BUILD_ID}"
+                    // Docker Hub'a giriş yapıyoruz
+                    withCredentials([usernamePassword(credentialsId: 'mustafadincer', passwordVariable: 'mustafadincer', usernameVariable: 'mustafadincer')]) {
+                        sh "echo $DOCKER_HUB_PASSWORD | docker login -u $DOCKER_HUB_USERNAME --password-stdin"
                     }
                 }
             }
+        }
+        
+        stage('Push to Docker Hub') {
+            steps {
+                script {
+                    // Docker imajını Docker Hub'a push ediyoruz
+                    sh "docker push ${DOCKER_HUB_REPO}:latest"
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            // İşlem sonunda çıkış yapıyoruz
+            sh 'docker logout'
         }
     }
 }
