@@ -22,16 +22,16 @@ pipeline {
             }
         }
         
-        stage('Login to Docker Hub') {
-            steps {
-                script {
-                    // Docker Hub'a giriş yapıyoruz
+	stage('Login to Docker Hub') {
+    	    steps {
+        	script {
+            	// Docker Hub'a giriş yapıyoruz
                     withCredentials([usernamePassword(credentialsId: 'd-hub-pat', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
-                        sh "echo $DOCKER_HUB_PASSWORD | docker login -u $DOCKER_HUB_USERNAME --password-stdin"
-                    }
-                }
-            }
-        }
+                    sh "echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin"
+            	}
+              }
+           }
+	}
         
         stage('Push to Docker Hub') {
             steps {
