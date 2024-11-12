@@ -15,7 +15,7 @@ pipeline {
 
         stage('Build and Test') {
             steps {
-                script {
+                node {
                     // Docker Compose ile containerları başlatıyoruz
                     sh 'docker-compose up -d'
                     // Testleri çalıştırıyoruz
@@ -26,7 +26,7 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                script {
+                node {
                     // Docker imajı oluşturuyoruz
                     sh "docker build -t ${IMAGE_NAME}:${env.BUILD_ID} ."
                 }
@@ -35,9 +35,12 @@ pipeline {
 
         stage('Push Docker Image') {
             steps {
-                script {
-                    docker.withRegistry('', 'DOCKERHUB_CREDENTIALS') {
-                        sh "docker push ${IMAGE_NAME}:${env.BUILD_ID}"
+                node {
+                    script {
+                        // Docker Hub'a bağlanıyoruz ve imajı pushlıyoruz
+                        docker.withRegistry('', 'DOCKERHUB_CREDENTIALS') {
+                            sh "docker push ${IMAGE_NAME}:${env.BUILD_ID}"
+                        }
                     }
                 }
             }
@@ -45,7 +48,7 @@ pipeline {
 
         stage('Deploy to Production') {
             steps {
-                script {
+                node {
                     // Production dağıtımı için gereken komutlar
                     sh 'docker-compose -f docker-compose.prod.yml up -d'
                 }
@@ -55,9 +58,11 @@ pipeline {
 
     post {
         always {
-            script {
-                // Temizlik işlemi - Çalışan containerları durdur ve kaldır
-                sh 'docker-compose down'
+            node {
+                script {
+                    // Temizlik işlemi - Çalışan containerları durdur ve kaldır
+                    sh 'docker-compose down'
+                }
             }
         }
     }
