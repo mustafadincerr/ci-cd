@@ -2,7 +2,11 @@ version: '3'
 
 services:
   backend:
+<<<<<<< HEAD
     image: mustafadincer/backend-app:latest
+=======
+    image: your_dockerhub_username/backend-app:latest
+>>>>>>> 7ab34f05a41ab2fc68cabf2b78d9c0c4f8982053
     ports:
       - '3000:3000'
     environment:
